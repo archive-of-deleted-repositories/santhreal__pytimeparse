@@ -155,6 +155,9 @@ def timeparse(sval, granularity='seconds'):
     5400
     '''
     match = COMPILED_SIGN.match(sval)
+    # Embedded newlines make the sign pattern fail to match (`.` is not DOTALL).
+    if match is None:
+        return None
     sign = -1 if match.groupdict()['sign'] == '-' else 1
     sval = match.groupdict()['unsigned']
     for timefmt in COMPILED_TIMEFORMATS:

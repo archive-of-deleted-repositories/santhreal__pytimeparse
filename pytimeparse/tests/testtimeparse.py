@@ -358,6 +358,14 @@ class TestTimeparse(unittest.TestCase):
         self.assertEqual(timeparse.timeparse('+5.6 weeks'), 3386880)
         self.assertEqual(timeparse.timeparse('-5.6 weeks'), -3386880)
 
+    def test_timeparse_embedded_newline_returns_none(self):
+        '''Embedded newlines must return None, not AttributeError.'''
+        self.assertIsNone(timeparse.timeparse('1\nm'))
+        self.assertIsNone(timeparse.timeparse('1\n2s'))
+        self.assertIsNone(timeparse.timeparse('1m\n2s'))
+        self.assertEqual(timeparse.timeparse('1m\n'), 60)
+        self.assertEqual(timeparse.timeparse('\n1m'), 60)
+
     def test_doctest(self):
         '''Run timeparse doctests.'''
         self.assertTrue(doctest.testmod(timeparse, raise_on_error=True))
