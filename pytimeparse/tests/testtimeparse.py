@@ -358,6 +358,15 @@ class TestTimeparse(unittest.TestCase):
         self.assertEqual(timeparse.timeparse('+5.6 weeks'), 3386880)
         self.assertEqual(timeparse.timeparse('-5.6 weeks'), -3386880)
 
+    def test_timeparse_nonfinite_float_secs(self):
+        '''Oversized float seconds must return None, not inf.'''
+        huge = '1' + '0' * 309 + '.5s'
+        self.assertIsNone(timeparse.timeparse(huge))
+        self.assertIsNone(timeparse.timeparse('+' + huge))
+        self.assertIsNone(timeparse.timeparse('-' + huge))
+        self.assertEqual(timeparse.timeparse('1.5s'), 1.5)
+        self.assertEqual(timeparse.timeparse('-1.5 seconds'), -1.5)
+
     def test_doctest(self):
         '''Run timeparse doctests.'''
         self.assertTrue(doctest.testmod(timeparse, raise_on_error=True))

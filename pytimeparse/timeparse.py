@@ -179,8 +179,11 @@ def timeparse(sval, granularity='seconds'):
                         (int(mdict['secs'], 10) if mdict['secs'] else 0))
                 else:
                     # SECS is a float, we will return a float
-                    return sign * sum([MULTIPLIERS[k] * float(v) for (k, v) in
+                    total = sign * sum([MULTIPLIERS[k] * float(v) for (k, v) in
                                 list(mdict.items()) if v is not None])
+                    # Out-of-range floats become inf; treat as unparseable.
+                    if abs(total) != float('inf'):
+                        return total
             except ValueError:
                 # Malformed number string (e.g. '1.2.3', '.') — skip to
                 # the next time format pattern per documented behavior.
