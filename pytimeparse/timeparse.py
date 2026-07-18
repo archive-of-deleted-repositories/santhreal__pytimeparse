@@ -155,6 +155,9 @@ def timeparse(sval, granularity='seconds'):
     5400
     '''
     match = COMPILED_SIGN.match(sval)
+    # Embedded newlines make the sign pattern fail to match (`.` is not DOTALL).
+    if match is None:
+        return None
     sign = -1 if match.groupdict()['sign'] == '-' else 1
     sval = match.groupdict()['unsigned']
     for timefmt in COMPILED_TIMEFORMATS:
@@ -181,7 +184,6 @@ def timeparse(sval, granularity='seconds'):
                     # SECS is a float, we will return a float
                     return sign * sum([MULTIPLIERS[k] * float(v) for (k, v) in
                                 list(mdict.items()) if v is not None])
-            except ValueError:
-                # Malformed number string (e.g. '1.2.3', '.') — skip to
-                # the next time format pattern per documented behavior.
+            except (ValueError, OverflowError):
+                # Malformed or out-of-range numbers; skip to next pattern.
                 pass
